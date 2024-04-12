@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Location Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+        }
+        #coordinates {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Current Location Map</h1>
+    <div id="map"></div>
+    <div id="coordinates">Latitude: <span id="latitude"></span>, Longitude: <span id="longitude"></span></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geolocation/1.0.0/leaflet-geolocation.min.js"></script>
+
+    <script>
+        var map = L.map('map').setView([0, 0], 13);
+
+        // Add the tile layer (you can use any tile layer provider)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Prompt user for location permission
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Display user's location on the map
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            map.setView([lat, lon], 13);
+
+            // Add a marker to the map
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup("Your Location")
+                .openPopup();
+
+            // Display latitude and longitude
+            document.getElementById("latitude").textContent = lat.toFixed(6);
+            document.getElementById("longitude").textContent = lon.toFixed(6);
+        }
+
+        // Error handling
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        // Ask for permission and show location on page load
+        window.onload = getLocation;
+    </script>
+</body>
+
+</html>
